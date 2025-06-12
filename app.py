@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
-import uvicorn
 import json
 import re
 from pathlib import Path
+from fastapi.responses import RedirectResponse
 
 # Load Discourse data
 with open("my_tds_forum_data.json", "r", encoding="utf-8") as f:
@@ -14,7 +14,20 @@ with open("my_tds_forum_data.json", "r", encoding="utf-8") as f:
 with open("tds_book.json", "r", encoding="utf-8") as f:
     course_data = json.load(f)
 
-app = FastAPI()
+app = FastAPI(
+    title="TDS Virtual TA",
+    description="Ask questions about the Tools in Data Science course.",
+    version="1.0.0",
+    docs_url="/docs",          # 👈 Explicitly enable Swagger docs
+    redoc_url="/redoc",        # 👈 Optional: ReDoc alternative docs
+    openapi_url="/openapi.json"  # 👈 Also expose OpenAPI schema
+)
+
+
+# Redirect root to Swagger UI
+@app.get("/")
+def redirect_to_docs():
+    return RedirectResponse(url="/docs")
 
 class QuestionRequest(BaseModel):
     question: str
@@ -49,7 +62,7 @@ def find_best_course_sections(question: str, top_k: int = 2):
     results = []
     for entry in course_data:
         score = keyword_match(question, entry["content"])
-        if score > 3:  # Filter out weak matches
+        if score > 3:
             results.append((score, entry))
     results.sort(reverse=True, key=lambda x: x[0])
     return [e for _, e in results[:top_k]]
@@ -89,6 +102,7 @@ def answer_question(req: QuestionRequest):
         links=links
     )
 
-# Uncomment to run locally
-# if __name__ == "__main__":
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+# Run app with uvicorn for Spaces
+import uvicorn
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=7860)
