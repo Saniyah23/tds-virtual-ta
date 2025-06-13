@@ -1,36 +1,42 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import json
 import re
-from pathlib import Path
 from fastapi.responses import RedirectResponse
-
-# Load Discourse data
-with open("my_tds_forum_data.json", "r", encoding="utf-8") as f:
-    discourse_data = json.load(f)
-
-# Load Course Content
-with open("tds_book.json", "r", encoding="utf-8") as f:
-    course_data = json.load(f)
 
 app = FastAPI(
     title="TDS Virtual TA",
     description="Ask questions about the Tools in Data Science course.",
     version="1.0.0",
-    docs_url="/docs",          # 👈 Explicitly enable Swagger docs
-    redoc_url="/redoc",        # 👈 Optional: ReDoc alternative docs
-    openapi_url="/openapi.json"  # 👈 Also expose OpenAPI schema
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
 )
 
-
-# Redirect root to Swagger UI
 @app.get("/")
 def redirect_to_docs():
     return RedirectResponse(url="/docs")
 
+# ✅ Global variables to be loaded at startup
+discourse_data = []
+course_data = []
+
+@app.on_event("startup")
+def load_data():
+    global discourse_data, course_data
+    try:
+        with open("my_tds_forum_data.json", "r", encoding="utf-8") as f:
+            discourse_data = json.load(f)
+        with open("tds_book.json", "r", encoding="utf-8") as f:
+            course_data = json.load(f)
+        print("✅ Loaded data successfully.")
+    except Exception as e:
+        print("❌ Error loading data:", e)
+
 class QuestionRequest(BaseModel):
     question: str
+    image: Optional[str] = None
 
 class LinkItem(BaseModel):
     url: str
@@ -70,13 +76,16 @@ def find_best_course_sections(question: str, top_k: int = 2):
 @app.post("/api", response_model=AnswerResponse)
 def answer_question(req: QuestionRequest):
     question = req.question
+
+    if req.image:
+        print("🖼️ Received an image, but it is not yet processed.")
+
     threads = find_best_threads(question)
     notes = find_best_course_sections(question)
 
     answer_parts = []
     links = []
 
-    # Discourse answers
     for idx, thread in enumerate(threads, 1):
         title = thread["title"]
         url = thread["url"]
@@ -85,7 +94,6 @@ def answer_question(req: QuestionRequest):
         answer_parts.append(f"{idx}. {snippet} – [{title}]({url})")
         links.append({"url": url, "text": title})
 
-    # Course content answers
     for note in notes:
         filename = note["filename"]
         title = note["title"]
@@ -101,8 +109,3 @@ def answer_question(req: QuestionRequest):
         answer="\n".join(answer_parts),
         links=links
     )
-
-# Run app with uvicorn for Spaces
-import uvicorn
-if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=7860)

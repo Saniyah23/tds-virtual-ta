@@ -1,11 +1,12 @@
 FROM python:3.10-slim
 
-WORKDIR /app
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Copy source code
+COPY . /code
+WORKDIR /code
 
 EXPOSE 7860
 
