@@ -80,7 +80,7 @@ def answer_question(req: QuestionRequest):
     cosine_similarities = cosine_similarity(question_vector, tfidf_matrix).flatten()
 
     # 3. Get the indices of the top N most similar documents
-    top_k = 5 # Get top 5 results to ensure good context
+    top_k = 10 # Get top 5 results to ensure good context
     # argsort returns indices that would sort the array, we take the last top_k in reverse
     top_indices = cosine_similarities.argsort()[-top_k:][::-1]
 
