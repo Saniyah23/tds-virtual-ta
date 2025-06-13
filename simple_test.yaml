@@ -1,0 +1,9 @@
+providers:
+  - id: mytestapi
+    config:
+      url: https://example.com/api
+
+tests:
+  - providers: [mytestapi]
+    vars:
+      prompt: 'hello'

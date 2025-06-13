@@ -1,0 +1,21 @@
+# A minimal test file to diagnose parsing issues.
+
+providers:
+  - id: my-ta-api
+    config:
+      url: https://tds-virtual-ta-43p3.onrender.com/api
+      method: POST
+      headers:
+        Content-Type: application/json
+      body: |
+        {
+          "question": "This is a test question"
+        }
+
+  - id: rubric-proxy
+    config:
+      url: https://aiproxy.sanand.workers.dev/openai/v1/chat/completions
+
+tests:
+  - providers: [my-ta-api]
+    # This test does nothing but prove the provider can be found.
