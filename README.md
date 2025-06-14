@@ -50,9 +50,9 @@ This repository is configured to deploy on Hugging Face Spaces using Docker (por
 3. **Build** and **run** automatically; visit the URL below:
 
 ```
-https://huggingface.co/spaces/<your-username>/tds-project-api
+https://tds-virtual-ta-43p3.onrender.com/api
 ```
 
 ---
 
-*Prepared by Saniyah Abdul Salam (23f300XXX).*
+*Prepared by Saniyah Abdul Salam (25ds1000071).*
