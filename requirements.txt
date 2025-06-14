@@ -1,7 +1,5 @@
 fastapi
 uvicorn
 scikit-learn
-sentence-transformers
 numpy
 python-dotenv
-aiohttp

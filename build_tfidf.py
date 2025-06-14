@@ -56,7 +56,7 @@ def build_and_save_tfidf():
     # This creates the matrix of TF-IDF features for all documents
     tfidf_matrix = vectorizer.fit_transform(all_docs)
     
-    print("✅ TF-IDF model created.")
+    print(" TF-IDF model created.")
 
     # --- 3. Save the model and data for the API ---
     with open("tfidf_vectorizer.pkl", "wb") as f:
@@ -68,7 +68,7 @@ def build_and_save_tfidf():
     with open("doc_references.json", "w", encoding="utf-8") as f:
         json.dump(doc_references, f)
 
-    print("✅ TF-IDF Vectorizer, Matrix, and References have been saved successfully!")
+    print(" TF-IDF Vectorizer, Matrix, and References have been saved successfully!")
 
 if __name__ == "__main__":
     build_and_save_tfidf()
